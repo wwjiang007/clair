@@ -20,7 +20,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/coreos/pkg/capnslog"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/coreos/clair/database"
@@ -28,8 +28,6 @@ import (
 )
 
 var (
-	log = capnslog.NewPackageLogger("github.com/coreos/clair", "ext/featurens")
-
 	detectorsM sync.RWMutex
 	detectors  = make(map[string]Detector)
 )
@@ -70,26 +68,29 @@ func RegisterDetector(name string, d Detector) {
 	detectors[name] = d
 }
 
-// Detect iterators through all registered Detectors and returns the first
-// non-nil detected namespace.
-func Detect(files tarutil.FilesMap) (*database.Namespace, error) {
+// Detect iterators through all registered Detectors and returns all non-nil detected namespaces
+func Detect(files tarutil.FilesMap) ([]database.Namespace, error) {
 	detectorsM.RLock()
 	defer detectorsM.RUnlock()
-
+	namespaces := map[string]*database.Namespace{}
 	for name, detector := range detectors {
 		namespace, err := detector.Detect(files)
 		if err != nil {
-			log.Warningf("failed while attempting to detect namespace %s: %s", name, err)
-			return nil, err
+			log.WithError(err).WithField("name", name).Warning("failed while attempting to detect namespace")
+			return []database.Namespace{}, err
 		}
 
 		if namespace != nil {
-			log.Debugf("detected namespace %s: %#v", name, namespace)
-			return namespace, nil
+			log.WithFields(log.Fields{"name": name, "namespace": namespace.Name}).Debug("detected namespace")
+			namespaces[namespace.Name] = namespace
 		}
 	}
 
-	return nil, nil
+	nslist := []database.Namespace{}
+	for _, ns := range namespaces {
+		nslist = append(nslist, *ns)
+	}
+	return nslist, nil
 }
 
 // RequiredFilenames returns the total list of files required for all

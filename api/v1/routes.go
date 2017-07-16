@@ -24,8 +24,10 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/prometheus/client_golang/prometheus"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/coreos/clair"
+	"github.com/coreos/clair/api/token"
 	"github.com/coreos/clair/database"
 	"github.com/coreos/clair/pkg/commonerr"
 	"github.com/coreos/clair/pkg/tarutil"
@@ -90,7 +92,7 @@ func writeResponse(w http.ResponseWriter, r *http.Request, status int, resp inte
 		case *json.MarshalerError, *json.UnsupportedTypeError, *json.UnsupportedValueError:
 			panic("v1: failed to marshal response: " + err.Error())
 		default:
-			log.Warningf("failed to write response: %s", err.Error())
+			log.WithError(err).Warning("failed to write response")
 		}
 	}
 }
@@ -208,7 +210,7 @@ func getVulnerabilities(w http.ResponseWriter, r *http.Request, p httprouter.Par
 	page := 0
 	pageStrs, pageExists := query["page"]
 	if pageExists {
-		err = tokenUnmarshal(pageStrs[0], ctx.PaginationKey, &page)
+		err = token.Unmarshal(pageStrs[0], ctx.PaginationKey, &page)
 		if err != nil {
 			writeResponse(w, r, http.StatusBadRequest, VulnerabilityEnvelope{Error: &Error{"invalid page format: " + err.Error()}})
 			return getNotificationRoute, http.StatusBadRequest
@@ -238,7 +240,7 @@ func getVulnerabilities(w http.ResponseWriter, r *http.Request, p httprouter.Par
 
 	var nextPageStr string
 	if nextPage != -1 {
-		nextPageBytes, err := tokenMarshal(nextPage, ctx.PaginationKey)
+		nextPageBytes, err := token.Marshal(nextPage, ctx.PaginationKey)
 		if err != nil {
 			writeResponse(w, r, http.StatusBadRequest, VulnerabilityEnvelope{Error: &Error{"failed to marshal token: " + err.Error()}})
 			return getNotificationRoute, http.StatusBadRequest
@@ -451,14 +453,14 @@ func getNotification(w http.ResponseWriter, r *http.Request, p httprouter.Params
 	page := database.VulnerabilityNotificationFirstPage
 	pageStrs, pageExists := query["page"]
 	if pageExists {
-		err := tokenUnmarshal(pageStrs[0], ctx.PaginationKey, &page)
+		err := token.Unmarshal(pageStrs[0], ctx.PaginationKey, &page)
 		if err != nil {
 			writeResponse(w, r, http.StatusBadRequest, NotificationEnvelope{Error: &Error{"invalid page format: " + err.Error()}})
 			return getNotificationRoute, http.StatusBadRequest
 		}
 		pageToken = pageStrs[0]
 	} else {
-		pageTokenBytes, err := tokenMarshal(page, ctx.PaginationKey)
+		pageTokenBytes, err := token.Marshal(page, ctx.PaginationKey)
 		if err != nil {
 			writeResponse(w, r, http.StatusBadRequest, NotificationEnvelope{Error: &Error{"failed to marshal token: " + err.Error()}})
 			return getNotificationRoute, http.StatusBadRequest

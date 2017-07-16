@@ -24,9 +24,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
-
-	"github.com/coreos/pkg/capnslog"
 
 	"github.com/coreos/clair/database"
 	"github.com/coreos/clair/ext/versionfmt"
@@ -36,13 +35,10 @@ import (
 )
 
 const (
-	// When available, this should be updated to use HTTPS.
-	secdbGitURL  = "http://git.alpinelinux.org/cgit/alpine-secdb"
+	secdbGitURL  = "https://git.alpinelinux.org/cgit/alpine-secdb"
 	updaterFlag  = "alpine-secdbUpdater"
 	nvdURLPrefix = "https://cve.mitre.org/cgi-bin/cvename.cgi?name="
 )
-
-var log = capnslog.NewPackageLogger("github.com/coreos/clair", "ext/vulnsrc/alpine")
 
 func init() {
 	vulnsrc.RegisterUpdater("alpine", &updater{})
@@ -53,7 +49,7 @@ type updater struct {
 }
 
 func (u *updater) Update(db database.Datastore) (resp vulnsrc.UpdateResponse, err error) {
-	log.Info("fetching Alpine vulnerabilities")
+	log.WithField("package", "Alpine").Info("Start fetching vulnerabilities")
 
 	// Pull the master branch.
 	var commit string
@@ -75,7 +71,7 @@ func (u *updater) Update(db database.Datastore) (resp vulnsrc.UpdateResponse, er
 
 	// Short-circuit if there have been no updates.
 	if commit == dbCommit {
-		log.Debug("no alpine update")
+		log.WithField("package", "alpine").Debug("no update")
 		return
 	}
 
@@ -187,7 +183,7 @@ func (u *updater) pullRepository() (commit string, err error) {
 		cmd.Dir = u.repositoryLocalPath
 		if out, err := cmd.CombinedOutput(); err != nil {
 			u.Clean()
-			log.Errorf("could not pull alpine-secdb repository: %s. output: %s", err, out)
+			log.WithError(err).WithField("output", string(out)).Error("could not pull alpine-secdb repository")
 			return "", commonerr.ErrCouldNotDownload
 		}
 	} else {
@@ -238,7 +234,7 @@ func parseYAML(r io.Reader) (vulns []database.Vulnerability, err error) {
 		for version, vulnStrs := range pkg.Fixes {
 			err := versionfmt.Valid(dpkg.ParserName, version)
 			if err != nil {
-				log.Warningf("could not parse package version '%s': %s. skipping", version, err.Error())
+				log.WithError(err).WithField("version", version).Warning("could not parse package version. skipping")
 				continue
 			}
 

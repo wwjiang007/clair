@@ -15,20 +15,12 @@
 package v1
 
 import (
-	"bytes"
-	"encoding/json"
-	"errors"
 	"fmt"
-	"time"
 
-	"github.com/coreos/pkg/capnslog"
-	"github.com/fernet/fernet-go"
-
+	"github.com/coreos/clair/api/token"
 	"github.com/coreos/clair/database"
 	"github.com/coreos/clair/ext/versionfmt"
 )
-
-var log = capnslog.NewPackageLogger("github.com/coreos/clair", "v1")
 
 type Error struct {
 	Message string `json:"Message,omitempty"`
@@ -36,7 +28,7 @@ type Error struct {
 
 type Layer struct {
 	Name             string            `json:"Name,omitempty"`
-	NamespaceName    string            `json:"NamespaceName,omitempty"`
+	NamespaceNames   []string          `json:"NamespaceNames,omitempty"`
 	Path             string            `json:"Path,omitempty"`
 	Headers          map[string]string `json:"Headers,omitempty"`
 	ParentName       string            `json:"ParentName,omitempty"`
@@ -55,8 +47,8 @@ func LayerFromDatabaseModel(dbLayer database.Layer, withFeatures, withVulnerabil
 		layer.ParentName = dbLayer.Parent.Name
 	}
 
-	if dbLayer.Namespace != nil {
-		layer.NamespaceName = dbLayer.Namespace.Name
+	for _, ns := range dbLayer.Namespaces {
+		layer.NamespaceNames = append(layer.NamespaceNames, ns.Name)
 	}
 
 	if withFeatures || withVulnerabilities && dbLayer.Features != nil {
@@ -230,7 +222,7 @@ func NotificationFromDatabaseModel(dbNotification database.VulnerabilityNotifica
 
 	var nextPageStr string
 	if nextPage != database.NoVulnerabilityNotificationPage {
-		nextPageBytes, _ := tokenMarshal(nextPage, key)
+		nextPageBytes, _ := token.Marshal(nextPage, key)
 		nextPageStr = string(nextPageBytes)
 	}
 
@@ -322,25 +314,4 @@ type FeatureEnvelope struct {
 	Feature  *Feature   `json:"Feature,omitempty"`
 	Features *[]Feature `json:"Features,omitempty"`
 	Error    *Error     `json:"Error,omitempty"`
-}
-
-func tokenUnmarshal(token string, key string, v interface{}) error {
-	k, _ := fernet.DecodeKey(key)
-	msg := fernet.VerifyAndDecrypt([]byte(token), time.Hour, []*fernet.Key{k})
-	if msg == nil {
-		return errors.New("invalid or expired pagination token")
-	}
-
-	return json.NewDecoder(bytes.NewBuffer(msg)).Decode(&v)
-}
-
-func tokenMarshal(v interface{}, key string) ([]byte, error) {
-	var buf bytes.Buffer
-	err := json.NewEncoder(&buf).Encode(v)
-	if err != nil {
-		return nil, err
-	}
-
-	k, _ := fernet.DecodeKey(key)
-	return fernet.EncryptAndSign(buf.Bytes(), k)
 }
