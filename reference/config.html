@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html lang="en" class="sidebar-visible no-js light">
+<html lang="en" class="light" dir="ltr">
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
@@ -10,7 +10,7 @@
         
         <meta name="description" content="Documentation for Clair.">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="theme-color" content="#ffffff" />
+        <meta name="theme-color" content="#ffffff">
 
         <link rel="icon" href="../favicon.svg">
         <link rel="shortcut icon" href="../favicon.png">
@@ -31,7 +31,7 @@
         <!-- Custom theme stylesheets -->
 
     </head>
-    <body>
+    <body class="sidebar-visible no-js">
     <div id="body-container">
         <!-- Provide site root to javascript -->
         <script>
@@ -61,42 +61,71 @@
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
             var html = document.querySelector('html');
-            html.classList.remove('no-js')
             html.classList.remove('light')
             html.classList.add(theme);
-            html.classList.add('js');
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
         </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
 
         <!-- Hide / unhide sidebar before it is displayed -->
         <script>
-            var html = document.querySelector('html');
+            var body = document.querySelector('body');
             var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
             if (document.body.clientWidth >= 1080) {
                 try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
                 sidebar = sidebar || 'visible';
             } else {
                 sidebar = 'hidden';
             }
-            html.classList.remove('sidebar-visible');
-            html.classList.add("sidebar-" + sidebar);
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
                 <ol class="chapter"><li class="chapter-item expanded "><a href="../whatis.html"><strong aria-hidden="true">1.</strong> What is ClairV4</a></li><li class="chapter-item expanded "><a href="../howto.html"><strong aria-hidden="true">2.</strong> How Tos</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../howto/getting_started.html"><strong aria-hidden="true">2.1.</strong> Getting Started With ClairV4</a></li><li class="chapter-item expanded "><a href="../howto/deployment.html"><strong aria-hidden="true">2.2.</strong> Deployment Models</a></li><li class="chapter-item expanded "><a href="../howto/api.html"><strong aria-hidden="true">2.3.</strong> API Definition</a></li><li class="chapter-item expanded "><a href="../howto/testing.html"><strong aria-hidden="true">2.4.</strong> Testing ClairV4</a></li></ol></li><li class="chapter-item expanded "><a href="../concepts.html"><strong aria-hidden="true">3.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../concepts/indexing.html"><strong aria-hidden="true">3.1.</strong> Indexing</a></li><li class="chapter-item expanded "><a href="../concepts/matching.html"><strong aria-hidden="true">3.2.</strong> Matching</a></li><li class="chapter-item expanded "><a href="../concepts/api_internal.html"><strong aria-hidden="true">3.3.</strong> Internal API</a></li><li class="chapter-item expanded "><a href="../concepts/authentication.html"><strong aria-hidden="true">3.4.</strong> Authentication</a></li><li class="chapter-item expanded "><a href="../concepts/notifications.html"><strong aria-hidden="true">3.5.</strong> Notifications</a></li><li class="chapter-item expanded "><a href="../concepts/updatersandairgap.html"><strong aria-hidden="true">3.6.</strong> Updaters and Airgap</a></li><li class="chapter-item expanded "><a href="../concepts/operation.html"><strong aria-hidden="true">3.7.</strong> Operation</a></li></ol></li><li class="chapter-item expanded "><a href="../contribution.html"><strong aria-hidden="true">4.</strong> Contribution</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../contribution/releases.html"><strong aria-hidden="true">4.1.</strong> Releases</a></li><li class="chapter-item expanded "><a href="../contribution/commit_style.html"><strong aria-hidden="true">4.2.</strong> Commit Style</a></li></ol></li><li class="chapter-item expanded "><a href="../reference.html"><strong aria-hidden="true">5.</strong> Reference</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../reference/api.html"><strong aria-hidden="true">5.1.</strong> Api</a></li><li class="chapter-item expanded "><a href="../reference/clairctl.html"><strong aria-hidden="true">5.2.</strong> Clairctl</a></li><li class="chapter-item expanded "><a href="../reference/config.html" class="active"><strong aria-hidden="true">5.3.</strong> Config</a></li><li class="chapter-item expanded "><a href="../reference/indexer.html"><strong aria-hidden="true">5.4.</strong> Indexer</a></li><li class="chapter-item expanded "><a href="../reference/matcher.html"><strong aria-hidden="true">5.5.</strong> Matcher</a></li><li class="chapter-item expanded "><a href="../reference/notifier.html"><strong aria-hidden="true">5.6.</strong> Notifier</a></li><li class="chapter-item expanded "><a href="../reference/metrics.html"><strong aria-hidden="true">5.7.</strong> Metrics</a></li></ol></li></ol>
             </div>
-            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
         </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
 
         <div id="page-wrapper" class="page-wrapper">
 
             <div class="page">
                                 <div id="menu-bar-hover-placeholder"></div>
-                <div id="menu-bar" class="menu-bar sticky bordered">
+                <div id="menu-bar" class="menu-bar sticky">
                     <div class="left-buttons">
-                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
                             <i class="fa fa-bars"></i>
-                        </button>
+                        </label>
                         <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
                             <i class="fa fa-paint-brush"></i>
                         </button>
@@ -149,9 +178,8 @@
                     <main>
                         <h1 id="config"><a class="header" href="#config">Config</a></h1>
 <h2 id="cli-flags-and-environment-variables"><a class="header" href="#cli-flags-and-environment-variables">CLI Flags And Environment Variables</a></h2>
-<p>Clair is configured by a structured yaml file. 
-Each Clair node needs to specify what mode it will run in and a path to a
-configuration file via CLI flags or environment variables.</p>
+<p>Clair is configured by a structured yaml or JSON<sup class="footnote-reference"><a href="#1">1</a></sup> file and an optional directory of &quot;merge&quot; and &quot;patch&quot; documents<sup class="footnote-reference"><a href="#1">1</a></sup>.
+Each Clair node needs to specify what mode it will run in and a path to a configuration file via CLI flags or environment variables.</p>
 <p>For example:</p>
 <pre><code class="language-shell">$ clair -conf ./path/to/config.yaml -mode indexer
 $ clair -conf ./path/to/config.yaml -mode matcher
@@ -170,8 +198,7 @@ $ clair -conf ./path/to/config.yaml -mode matcher
     A file system path to Clair's config file
 </code></pre>
 <p>The above example starts two Clair nodes using the same configuration.
-One will only run the indexing facilities while the other will only run the
-matching facilities.</p>
+One will only run the indexing facilities while the other will only run the matching facilities.</p>
 <p>Environment variables respected by the Go standard library can be specified
 if needed. Some notable examples:</p>
 <ul>
@@ -181,9 +208,24 @@ if needed. Some notable examples:</p>
 </ul>
 <p>If running in &quot;combo&quot; mode you <strong>must</strong> supply the <code>indexer</code>, <code>matcher</code>,
 and <code>notifier</code> configuration blocks in the configuration.</p>
+<h2 id="configuration-dropins"><a class="header" href="#configuration-dropins">Configuration dropins</a></h2>
+<p>Starting in Clair version <code>4.7.0</code>, dropin configuration files are supported.</p>
+<p>Given a root configurtaion file of <code>/etc/clair/config.json</code>, all files matching the globs <code>/etc/clair/config.json.d/*.json</code> and <code>/etc/clair/config.json.d/*.json-patch</code> would be loaded in lexical order after the root configuration file.
+Similarly, given <code>/etc/clair/config.yaml</code>, all files matching the globs <code>/etc/clair/config.yaml.d/*.yaml</code> and <code>/etc/clair/config.yaml.d/*.yaml-patch</code> would be loaded.
+Only the extensions <code>yaml</code> and <code>json</code> are supported, and indicate yaml and JSON formatting, respectively.</p>
+<p>The dropin files must have the same extension and format as the root file.
+Dropins with the bare suffix are treated as <a href="rfc7386">merge documents</a>.
+Dropins with the <code>-patch</code> suffix are treated as <a href="rfc6902">patch documents</a> and must contain a valid <a href="rfc6902">RFC 6902</a> structure.
+Yaml documents must be resolvable to the JSON subset.</p>
+<p>Take care with the <a href="rfc7386">merge</a> behavior around lists; a patch operation may be more suitable.
+The <code>clairctl check-config</code> command can be used to ensure a merged configuration is what is intended.
+In addition, placing <code>test</code> operations in a patch file that's evaluated last (such as <code>zz-validate.json-patch</code>) can be used to have Clair refuse to start if some configuration values are not what is intended.</p>
+<p>The application defaults are applied <em>after</em> the configuration is loaded and as such, not reflected in the <code>clairctl check-config</code> command.
+The output of that command is also not currently suitable to be used to &quot;compile&quot; a config to a single file.</p>
 <h2 id="configuration-reference"><a class="header" href="#configuration-reference">Configuration Reference</a></h2>
-<p>Please see the <a href="https://pkg.go.dev/github.com/quay/clair/config">go module documentation</a> for additional
-documentation on defaults and use.</p>
+<p>Please see the <a href="https://pkg.go.dev/github.com/quay/clair/config">go module documentation</a> for additional documentation on defaults and use.
+Starting in version <code>4.7.0</code>, unknown keys are disallowed.
+Configurations that looked valid previously and loaded fine may now cause Clair to refuse to start.</p>
 <pre><code>http_listen_addr: &quot;&quot;
 introspection_addr: &quot;&quot;
 log_level: &quot;&quot;
@@ -238,8 +280,6 @@ metrics:
     name: &quot;&quot;
     prometheus:
         endpoint: null
-    dogstatsd:
-        url: &quot;&quot;
 </code></pre>
 <p>Note: the above just lists every key for completeness. Copy-pasting the above as
 a starting point for configuration will result in some options not having their
@@ -351,7 +391,7 @@ The location of this Indexer is required.</p>
 <h4 id="matcherperiod"><a class="header" href="#matcherperiod"><code>$.matcher.period</code></a></h4>
 <p>A time.ParseDuration parseable string.</p>
 <p>Determines how often updates for new security advisories will take place.</p>
-<p>Defaults to 30 minutes.</p>
+<p>Defaults to 6 hours.</p>
 <h4 id="matcherdisable_updaters"><a class="header" href="#matcherdisable_updaters"><code>$.matcher.disable_updaters</code></a></h4>
 <p>A boolean value.</p>
 <p>Whether to run background updates or not.</p>
@@ -614,6 +654,10 @@ JWT claim.</p>
 <h4 id="metricsprometheusendpoint"><a class="header" href="#metricsprometheusendpoint"><code>$.metrics.prometheus.endpoint</code></a></h4>
 <p>a string value</p>
 <p>Defines the path where metrics will be served.</p>
+<hr />
+<div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
+<p>Support added in version <code>4.7.0</code>.</p>
+</div>
 
                     </main>
 
@@ -623,7 +667,7 @@ JWT claim.</p>
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next" href="../reference/indexer.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../reference/indexer.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -637,7 +681,7 @@ JWT claim.</p>
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next" href="../reference/indexer.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../reference/indexer.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

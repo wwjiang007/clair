@@ -1,17 +1,17 @@
 <!DOCTYPE HTML>
-<html lang="en" class="sidebar-visible no-js light">
+<html lang="en" class="light" dir="ltr">
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
         <title>Clair Documentation</title>
-        <meta name="robots" content="noindex" />
+        <meta name="robots" content="noindex">
 
 
         <!-- Custom HTML head -->
         
         <meta name="description" content="Documentation for Clair.">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="theme-color" content="#ffffff" />
+        <meta name="theme-color" content="#ffffff">
 
         <link rel="icon" href="favicon.svg">
         <link rel="shortcut icon" href="favicon.png">
@@ -32,7 +32,7 @@
         <!-- Custom theme stylesheets -->
 
     </head>
-    <body>
+    <body class="sidebar-visible no-js">
     <div id="body-container">
         <!-- Provide site root to javascript -->
         <script>
@@ -62,42 +62,71 @@
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
             var html = document.querySelector('html');
-            html.classList.remove('no-js')
             html.classList.remove('light')
             html.classList.add(theme);
-            html.classList.add('js');
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
         </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
 
         <!-- Hide / unhide sidebar before it is displayed -->
         <script>
-            var html = document.querySelector('html');
+            var body = document.querySelector('body');
             var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
             if (document.body.clientWidth >= 1080) {
                 try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
                 sidebar = sidebar || 'visible';
             } else {
                 sidebar = 'hidden';
             }
-            html.classList.remove('sidebar-visible');
-            html.classList.add("sidebar-" + sidebar);
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
                 <ol class="chapter"><li class="chapter-item expanded "><a href="whatis.html"><strong aria-hidden="true">1.</strong> What is ClairV4</a></li><li class="chapter-item expanded "><a href="howto.html"><strong aria-hidden="true">2.</strong> How Tos</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="howto/getting_started.html"><strong aria-hidden="true">2.1.</strong> Getting Started With ClairV4</a></li><li class="chapter-item expanded "><a href="howto/deployment.html"><strong aria-hidden="true">2.2.</strong> Deployment Models</a></li><li class="chapter-item expanded "><a href="howto/api.html"><strong aria-hidden="true">2.3.</strong> API Definition</a></li><li class="chapter-item expanded "><a href="howto/testing.html"><strong aria-hidden="true">2.4.</strong> Testing ClairV4</a></li></ol></li><li class="chapter-item expanded "><a href="concepts.html"><strong aria-hidden="true">3.</strong> Concepts</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="concepts/indexing.html"><strong aria-hidden="true">3.1.</strong> Indexing</a></li><li class="chapter-item expanded "><a href="concepts/matching.html"><strong aria-hidden="true">3.2.</strong> Matching</a></li><li class="chapter-item expanded "><a href="concepts/api_internal.html"><strong aria-hidden="true">3.3.</strong> Internal API</a></li><li class="chapter-item expanded "><a href="concepts/authentication.html"><strong aria-hidden="true">3.4.</strong> Authentication</a></li><li class="chapter-item expanded "><a href="concepts/notifications.html"><strong aria-hidden="true">3.5.</strong> Notifications</a></li><li class="chapter-item expanded "><a href="concepts/updatersandairgap.html"><strong aria-hidden="true">3.6.</strong> Updaters and Airgap</a></li><li class="chapter-item expanded "><a href="concepts/operation.html"><strong aria-hidden="true">3.7.</strong> Operation</a></li></ol></li><li class="chapter-item expanded "><a href="contribution.html"><strong aria-hidden="true">4.</strong> Contribution</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="contribution/releases.html"><strong aria-hidden="true">4.1.</strong> Releases</a></li><li class="chapter-item expanded "><a href="contribution/commit_style.html"><strong aria-hidden="true">4.2.</strong> Commit Style</a></li></ol></li><li class="chapter-item expanded "><a href="reference.html"><strong aria-hidden="true">5.</strong> Reference</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="reference/api.html"><strong aria-hidden="true">5.1.</strong> Api</a></li><li class="chapter-item expanded "><a href="reference/clairctl.html"><strong aria-hidden="true">5.2.</strong> Clairctl</a></li><li class="chapter-item expanded "><a href="reference/config.html"><strong aria-hidden="true">5.3.</strong> Config</a></li><li class="chapter-item expanded "><a href="reference/indexer.html"><strong aria-hidden="true">5.4.</strong> Indexer</a></li><li class="chapter-item expanded "><a href="reference/matcher.html"><strong aria-hidden="true">5.5.</strong> Matcher</a></li><li class="chapter-item expanded "><a href="reference/notifier.html"><strong aria-hidden="true">5.6.</strong> Notifier</a></li><li class="chapter-item expanded "><a href="reference/metrics.html"><strong aria-hidden="true">5.7.</strong> Metrics</a></li></ol></li></ol>
             </div>
-            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
         </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
 
         <div id="page-wrapper" class="page-wrapper">
 
             <div class="page">
                                 <div id="menu-bar-hover-placeholder"></div>
-                <div id="menu-bar" class="menu-bar sticky bordered">
+                <div id="menu-bar" class="menu-bar sticky">
                     <div class="left-buttons">
-                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
                             <i class="fa fa-bars"></i>
-                        </button>
+                        </label>
                         <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
                             <i class="fa fa-paint-brush"></i>
                         </button>
@@ -235,7 +264,10 @@ The command will be in the Clair container, but can also be installed locally by
 <p>You can submit a manifest to ClairV4 via the following command.</p>
 <pre><code class="language-shell">$ clairctl report --host ${net_address_of_clair} ${image_tag}
 </code></pre>
-<p>By default, <code>clairctl</code> will look for Clair at <code>localhost:6060</code>.</p>
+<p>You will need to add the <code>config</code> flag if you are using a PSK authentication (as in the <a href="howto/./testing.html">local dev environment</a> setup, for example).</p>
+<pre><code class="language-shell">$ clairctl report --config local-dev/clair/config.yaml --host ${net_address_of_clair} ${image_tag}
+</code></pre>
+<p>By default, <code>clairctl</code> will look for Clair at <code>localhost:6060</code> or the environment variable <code>CLAIR_API</code>, and for a configuration at <code>config.yaml</code> or the environment variable <code>CLAIR_CONF</code>.</p>
 <p>If everything is configured correctly, you should see some output like the following informing you of vulnerabilities affecting the supplied image.</p>
 <pre><code class="language-shell">$ clairctl report ubuntu:focal
 ubuntu:focal found bash        5.0-6ubuntu1.1         CVE-2019-18276
@@ -264,6 +296,9 @@ ubuntu:focal found libc6       2.31-0ubuntu9          CVE-2016-10228
 ubuntu:focal found libc6       2.31-0ubuntu9          CVE-2020-6096
 ubuntu:focal found libgcrypt20 1.8.5-5ubuntu1         CVE-2019-12904
 </code></pre>
+<p>To test locally-built images, you'll need to push them to a registry that is accessible by the Clair service and the <code>clairctl</code> command.
+A local registry can be used for this, but the specifics of configuration vary by registry and container runtime.
+Consult the relevant documentation for more information.</p>
 <h2 id="whats-next"><a class="header" href="#whats-next">What's Next</a></h2>
 <p>Now that you see the basic usage of Clair, you can checkout our <a href="howto/./deployment.html">deployment models</a> to learn different ways of deploying.</p>
 <p>You may also be curious about how <code>clairctl</code> did that work. Check out our <a href="howto/./api.html">API definition</a> to understand how an application interacts with Clair.</p>
@@ -356,18 +391,18 @@ notifier:
 This environment can be used to test and develop Clair's Quay integration.</p>
 <h2 id="requirements"><a class="header" href="#requirements">Requirements</a></h2>
 <h3 id="make"><a class="header" href="#make">Make</a></h3>
-<p>Make is used to stand up the the local dev environment.
+<p>Make is used to stand up the local dev environment.
 Make is readily available in just about every package manager you can think of.
 It's very likely your workstation already has make on it.</p>
-<h3 id="docker-and-docker-compose"><a class="header" href="#docker-and-docker-compose">Docker and Docker Compose</a></h3>
+<h3 id="podmandocker-and-docker-compose"><a class="header" href="#podmandocker-and-docker-compose">Podman/Docker and Docker Compose</a></h3>
 <p>Currently our local dev tooling is supported by docker and docker-compose.
 Podman should work fine since v3.0.</p>
 <p>Docker version 19.03.11 and docker-compose version 1.28.6 are confirmed working.
 Our assumption is most recent versions will not have an issue running the local dev tooling.</p>
-<p>See <a href="https://docs.docker.com/get-docker/">Install Docker</a></p>
+<p>See <a href="https://podman.io/get-started">Get Started with Podman</a>.</p>
 <h3 id="go-toolchain"><a class="header" href="#go-toolchain">Go Toolchain</a></h3>
-<p>Go v1.16 or higher is required.</p>
-<p>See <a href="https://golang.org/doc/install">Install Golang</a></p>
+<p>Go 1.20 or higher is required.</p>
+<p>See <a href="https://golang.org/doc/install">Install Golang</a>.</p>
 <h2 id="starting-a-cluster"><a class="header" href="#starting-a-cluster">Starting a cluster</a></h2>
 <pre><code>git clone git@github.com:quay/clair.git
 cd clair
@@ -379,24 +414,34 @@ docker-compose up -d
 <p>After the local development environment successfully starts, the following infrastructure is available to you:</p>
 <ul>
 <li>
-<p><code>localhost:8080</code>
-Dashboards and debugging services -- See the traefik configs in <code>local-dev/traefik</code> for where the various services are served.</p>
+<p><code>localhost:8080</code></p>
+<p>Dashboards and debugging services -- See the traefik configs in <code>local-dev/traefik</code> for where the various services are served.</p>
 </li>
 <li>
-<p><code>localhost:6060</code>
-Clair services</p>
+<p><code>localhost:6060</code></p>
+<p>Clair services.</p>
 </li>
 <li>
-<p>Quay (if started)
-Quay will be started in a single node, local storage configuration.
+<p>Quay (if started)</p>
+<p>Quay will be started in a single node, local storage configuration.
 A random port will be forwarded from localhost, see <code>podman port</code> for the mapping.</p>
 </li>
 <li>
-<p>PostgreSQL
-PostgreSQL will have a random port forwarded from localhost to the database server.
+<p>PostgreSQL</p>
+<p>PostgreSQL will have a random port forwarded from localhost to the database server.
 See <code>local-dev/clair/init.sql</code> for credentials and permissions and <code>podman port</code> for the mapping.</p>
 </li>
 </ul>
+<h3 id="debugging"><a class="header" href="#debugging">Debugging</a></h3>
+<p>With the <code>local-dev-debug</code> make target the operator has access to some more useful tools:</p>
+<div class="table-wrapper"><table><thead><tr><th>Tool</th><th>Description</th><th>URL</th><th>Credentials</th></tr></thead><tbody>
+<tr><td>pgAdmin</td><td>Postgres administration</td><td><a href="http://localhost:8080/pgadmin">localhost:8080/pgadmin</a></td><td>clair@clair.com:clair</td></tr>
+<tr><td>jaeger</td><td>Distributed tracing</td><td><a href="http://localhost:8080/jaeger">localhost:8080/jaeger</a></td><td>-</td></tr>
+<tr><td>prometheus</td><td>Metrics collection and querying</td><td><a href="http://localhost:8080/prom">localhost:8080/prom</a></td><td>-</td></tr>
+<tr><td>pyroscope</td><td>Continuous profiling</td><td><a href="http://localhost:8080/pyroscope">localhost:8080/pyroscope</a></td><td>-</td></tr>
+<tr><td>grafana</td><td>Metrics dashboards</td><td><a href="http://localhost:8080/grafana">localhost:8080/grafana</a></td><td>admin:admin</td></tr>
+</tbody></table>
+</div>
 <h2 id="pushing-to-the-local-quay"><a class="header" href="#pushing-to-the-local-quay">Pushing to the Local Quay</a></h2>
 <p>As mentioned above, Quay is forwarded to a random port on the host.
 You can connect to the server on that port and create a account.
@@ -404,8 +449,9 @@ Creating an account named <code>admin</code> will ensure you are a super user.
 An email is required, but is not validated.
 You'll also need to create a namespace.</p>
 <p>To push to Quay, you'll need to exec into the skopeo container:</p>
-<pre><code class="language-sh">podman exec -it quay-skopeo /usr/bin/skopeo copy --dst-creds '&lt;user&gt;:&lt;pass&gt;' --dst-tls-verify=false &lt;src&gt; clair-quay:8080/&lt;namespace&gt;/&lt;repo&gt;:&lt;tag&gt;
+<pre><code class="language-shell">docker-compose exec -it skopeo /usr/bin/skopeo copy --dest-creds '&lt;user&gt;:&lt;pass&gt;' --dest-tls-verify=false &lt;src&gt; docker://clair-quay:8080/&lt;namespace&gt;/&lt;repo&gt;:&lt;tag&gt;
 </code></pre>
+<p>Note that skopeo expects its image arguments in <a href="https://github.com/containers/image/blob/main/docs/containers-transports.5.md"><code>containers-transports(5)</code></a> format.</p>
 <h2 id="viewing-results"><a class="header" href="#viewing-results">Viewing Results</a></h2>
 <p>By default, Quay displays security scanner results on the Tags page of the given repository.</p>
 <h2 id="making-changes-to-configuration"><a class="header" href="#making-changes-to-configuration">Making changes to configuration</a></h2>
@@ -420,12 +466,12 @@ The quay-specific clair config is autogenerated, see the <code>Makefile</code>.<
 <h2 id="troubleshooting"><a class="header" href="#troubleshooting">Troubleshooting</a></h2>
 <p>The most common issue encountered when standing up the dev environment is port conflicts.
 Make sure that you do not have any other processes listening on any of the ports outlined above.</p>
-<p>The second issue you may face is your Docker resource settings maybe too constrained to support the local dev stack.
+<p>The second issue you may face is your Docker resource settings being too constrained to support the local dev stack.
 This is typically seen on Docker4Mac since a VM is used with a specific set of resources configured.
 See <a href="https://docs.docker.com/docker-for-mac/">Docker For Mac Manual</a> for instructions on how to change these resources.</p>
 <p>If <code>docker-compose</code> reports errors like <code>Unsupported config option for services.activemq: 'profiles'</code>, the <code>docker-compose</code> version is too old and you'll need to upgrade.
 Consult the relevant documentation for your environment for instructions.</p>
-<p>Lastly, you can view traefik's ui at <code>localhost:8080/dashboard/</code>.</p>
+<p>Lastly, you can view traefik's ui at <a href="http://localhost:8080/dashboard/"><code>localhost:8080/dashboard/</code></a>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="concepts"><a class="header" href="#concepts">Concepts</a></h1>
 <p>The following sections give a conceptual overview of how Clair works internally.</p>
 <ul>
@@ -473,7 +519,7 @@ Further information and usage is an effort left to the reader.</p>
 This is used by the notifier to determine the added and removed vulnerabilities on security databsae update.</p>
 <h2 id="update-operation"><a class="header" href="#update-operation">Update Operation</a></h2>
 <p>The <code>update_operation</code> endpoint exposes the api for viewing updaters' activity. 
-This is used by the notifier to determine if new updates have occured and triggers an update diff to see what has changed.</p>
+This is used by the notifier to determine if new updates have occurred and triggers an update diff to see what has changed.</p>
 <h2 id="affectedmanifest"><a class="header" href="#affectedmanifest">AffectedManifest</a></h2>
 <p>The <code>affected_manifest</code> endpoint exposes the api for retreiving affected manifests given a list of Vulnerabilities.
 This is used by the notifier to determine the manifests that need to have a notification generated.</p>
@@ -497,17 +543,17 @@ encoded symmetric key for validating the requests.</p>
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="notifications-1"><a class="header" href="#notifications-1">Notifications</a></h1>
 <p>ClairV4 implements a notification system.</p>
-<p>The notifier service will keep track of new security database updates and inform an interested client if new or removed vulnerabilites affect an indexed manifest.</p>
+<p>The notifier service will keep track of new security database updates and inform an interested client if new or removed vulnerabilities affect an indexed manifest.</p>
 <p>The interested client can subscribe to notifications via several mechanisms:</p>
 <ul>
 <li>Webhook delivery</li>
 <li>AMQP delivery</li>
 <li>STOMP delivery</li>
 </ul>
-<p>Configuring the notifier is done via the yaml configuration. </p>
+<p>Configuring the notifier is done via the yaml configuration.</p>
 <p>See the &quot;Notifier&quot; object in our <a href="concepts/../reference/config.html">config reference</a></p>
 <h2 id="a-notification"><a class="header" href="#a-notification">A Notification</a></h2>
-<p>When the notifier becomes aware of new vulnerabilities affecting a previously indexed manifest, it will use the configured method(s) to issue notifications about the new changes. Any given notification expresses the <strong>most severe</strong> vulnerability discovered because of the change. This avoids creating a flurry of notifications for the same security database update. </p>
+<p>When the notifier becomes aware of new vulnerabilities affecting a previously indexed manifest, it will use the configured method(s) to issue notifications about the new changes. Any given notification expresses the <strong>most severe</strong> vulnerability discovered because of the change. This avoids creating a flurry of notifications for the same security database update.</p>
 <p>Once a client receives a notification, it should issue a new request against the <a href="concepts/../reference/matcher.html">matcher</a> to receive an up-to-date vulnerability report.</p>
 <p>The notification schema is the JSON marshaled form of the following types:</p>
 <pre><code class="language-go">// Reason indicates the catalyst for a notification
@@ -541,13 +587,13 @@ type VulnSummary struct {
 <li>A target URL where the webhook will fire</li>
 <li>The callback URL where the notifier may be reached including its API path
 <ul>
-<li>e.g. &quot;http://clair-notifier/notifier/api/v1/notifications&quot;</li>
+<li>e.g. &quot;http://clair-notifier/notifier/api/v1/notification&quot;</li>
 </ul>
 </li>
 </ul>
 <p>When the notifier has determined an updated security database has changed the affected status of an indexed manifest, it will deliver the following JSON body to the configured target:</p>
 <pre><code class="language-json">{
-  &quot;notifiction_id&quot;: {uuid_string},
+  &quot;notification_id&quot;: {uuid_string},
   &quot;callback&quot;: {url_to_notifications}
 }
 </code></pre>
@@ -558,14 +604,14 @@ type VulnSummary struct {
 <pre><code class="language-go">GET /notifier/api/v1/notification/{id}?[page_size=N][next=N]
 {
   page: {
-    size:    int,      // maximum number of notifications in the response 
+    size:    int,      // maximum number of notifications in the response
     next:   string, //  if present, the next id to fetch.
   }
   notifications: [ Notification… ] // array of notifications; max len == page.size
 }
 </code></pre>
 <p>The GET callback request implements a simple bare-minimum paging mechanism.</p>
-<p>The &quot;page_size&quot; url param controls how many notifications are returned in a single page. 
+<p>The &quot;page_size&quot; url param controls how many notifications are returned in a single page.
 If not provided a default of 500 is used.</p>
 <p>The &quot;next&quot; url param informs Clair the next set of paged notifications to return. If not provided the 0th page is assumed.</p>
 <p>A page object accompanying the notification list specifies &quot;next&quot; and &quot;size&quot; fields.</p>
@@ -573,10 +619,10 @@ If not provided a default of 500 is used.</p>
 <p>The &quot;size&quot; field will simply echo back the request page_size parameter.</p>
 <p>When the final page is served to the client the returned &quot;page&quot; data structure will not contain a &quot;next&quot; member.</p>
 <p>Therefore the following loop is valid for obtaining all notifications for a notification id in pages of a specified size.</p>
-<pre><code>{ page, notifications } = http.Get(&quot;http://clairv4/notifier/api/v1/notifications/{id}?page_size=1000&quot;)
+<pre><code>{ page, notifications } = http.Get(&quot;http://clairv4/notifier/api/v1/notification/{id}?page_size=1000&quot;)
 
 while (page.Next != None) {
-    { page, notifications } = http.Get(&quot;http://clairv4/notifier/api/v1/notifications/{id}?next={page.Next},page_size=1000&quot;)
+    { page, notifications } = http.Get(&quot;http://clairv4/notifier/api/v1/notification/{id}?next={page.Next},page_size=1000&quot;)
 }
 </code></pre>
 <p><em>Note: If the client specifies a custom page_size it must specify this page_size on every request for accurate responses.</em></p>
@@ -763,14 +809,14 @@ headingLevel: 2</li>
 </ul>
 <hr />
 <!-- Generator: Widdershins v4.0.1 -->
-<h1 id="clairv4">ClairV4 v1.1</h1>
+<h1 id="clairv4"><a class="header" href="#clairv4">ClairV4 v1.1</a></h1>
 <blockquote>
 <p>Scroll down for code samples, example requests and responses. Select a language for code samples from the tabs above or the mobile navigation menu.</p>
 </blockquote>
 <p>ClairV4 is a set of cooperating microservices which scan, index, and match your container's content with known vulnerabilities.</p>
 <p>Email: <a href="mailto:quay-devel@redhat.com">Clair Team</a> Web: <a href="http://github.com/quay/clair">Clair Team</a> 
 License: <a href="http://www.apache.org/licenses/">Apache License 2.0</a></p>
-<h1 id="clairv4-notifier">Notifier</h1>
+<h1 id="clairv4-notifier"><a class="header" href="#clairv4-notifier">Notifier</a></h1>
 <h2 id="deletenotification"><a class="header" href="#deletenotification">DeleteNotification</a></h2>
 <p><a id="opIdDeleteNotification"></a></p>
 <blockquote>
@@ -829,7 +875,7 @@ fetch('/notifier/api/v1/notification/{notification_id}',
 </code></pre>
 <p><code>DELETE /notifier/api/v1/notification/{notification_id}</code></p>
 <p>Issues a delete of the provided notification id and all associated notifications. After this delete clients will no longer be able to retrieve notifications.</p>
-<h3 id="deletenotification-parameters">Parameters</h3>
+<h3 id="deletenotification-parameters"><a class="header" href="#deletenotification-parameters">Parameters</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead><tbody>
 <tr><td>notification_id</td><td>path</td><td>string</td><td>false</td><td>A notification ID returned by a callback</td></tr>
 </tbody></table>
@@ -845,7 +891,7 @@ fetch('/notifier/api/v1/notification/{notification_id}',
   &quot;message&quot;: &quot;string&quot;
 }
 </code></pre>
-<h3 id="deletenotification-responses">Responses</h3>
+<h3 id="deletenotification-responses"><a class="header" href="#deletenotification-responses">Responses</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Status</th><th>Meaning</th><th>Description</th><th>Schema</th></tr></thead><tbody>
 <tr><td>200</td><td><a href="https://tools.ietf.org/html/rfc7231#section-6.3.1">OK</a></td><td>OK</td><td>None</td></tr>
 <tr><td>400</td><td><a href="https://tools.ietf.org/html/rfc7231#section-6.5.1">Bad Request</a></td><td>Bad Request</td><td><a href="reference/api.html#schemaerror">Error</a></td></tr>
@@ -913,7 +959,7 @@ fetch('/notifier/api/v1/notification/{notification_id}',
 </code></pre>
 <p><code>GET /notifier/api/v1/notification/{notification_id}</code></p>
 <p>By performing a GET with a notification_id as a path parameter, the client will retrieve a paginated response of notification objects.</p>
-<h3 id="retrieve-a-paginated-result-of-notifications-for-the-provided-id.-parameters">Parameters</h3>
+<h3 id="retrieve-a-paginated-result-of-notifications-for-the-provided-id.-parameters"><a class="header" href="#retrieve-a-paginated-result-of-notifications-for-the-provided-id.-parameters">Parameters</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead><tbody>
 <tr><td>notification_id</td><td>path</td><td>string</td><td>false</td><td>A notification ID returned by a callback</td></tr>
 <tr><td>page_size</td><td>query</td><td>int</td><td>false</td><td>The maximum number of notifications to deliver in a single page.</td></tr>
@@ -982,7 +1028,7 @@ fetch('/notifier/api/v1/notification/{notification_id}',
   ]
 }
 </code></pre>
-<h3 id="retrieve-a-paginated-result-of-notifications-for-the-provided-id.-responses">Responses</h3>
+<h3 id="retrieve-a-paginated-result-of-notifications-for-the-provided-id.-responses"><a class="header" href="#retrieve-a-paginated-result-of-notifications-for-the-provided-id.-responses">Responses</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Status</th><th>Meaning</th><th>Description</th><th>Schema</th></tr></thead><tbody>
 <tr><td>200</td><td><a href="https://tools.ietf.org/html/rfc7231#section-6.3.1">OK</a></td><td>A paginated list of notifications</td><td><a href="reference/api.html#schemapagednotifications">PagedNotifications</a></td></tr>
 <tr><td>400</td><td><a href="https://tools.ietf.org/html/rfc7231#section-6.5.1">Bad Request</a></td><td>Bad Request</td><td><a href="reference/api.html#schemaerror">Error</a></td></tr>
@@ -992,7 +1038,7 @@ fetch('/notifier/api/v1/notification/{notification_id}',
 </div><aside class="success">
 This operation does not require authentication
 </aside>
-<h1 id="clairv4-indexer">Indexer</h1>
+<h1 id="clairv4-indexer"><a class="header" href="#clairv4-indexer">Indexer</a></h1>
 <h2 id="index-the-contents-of-a-manifest"><a class="header" href="#index-the-contents-of-a-manifest">Index the contents of a Manifest</a></h2>
 <p><a id="opIdIndex"></a></p>
 <blockquote>
@@ -1091,7 +1137,7 @@ fetch('/indexer/api/v1/index_report',
   ]
 }
 </code></pre>
-<h3 id="index-the-contents-of-a-manifest-parameters">Parameters</h3>
+<h3 id="index-the-contents-of-a-manifest-parameters"><a class="header" href="#index-the-contents-of-a-manifest-parameters">Parameters</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead><tbody>
 <tr><td>body</td><td>body</td><td><a href="reference/api.html#schemamanifest">Manifest</a></td><td>true</td><td>none</td></tr>
 </tbody></table>
@@ -1150,7 +1196,7 @@ fetch('/indexer/api/v1/index_report',
   &quot;err&quot;: &quot;&quot;
 }
 </code></pre>
-<h3 id="index-the-contents-of-a-manifest-responses">Responses</h3>
+<h3 id="index-the-contents-of-a-manifest-responses"><a class="header" href="#index-the-contents-of-a-manifest-responses">Responses</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Status</th><th>Meaning</th><th>Description</th><th>Schema</th></tr></thead><tbody>
 <tr><td>201</td><td><a href="https://tools.ietf.org/html/rfc7231#section-6.3.2">Created</a></td><td>IndexReport Created</td><td><a href="reference/api.html#schemaindexreport">IndexReport</a></td></tr>
 <tr><td>400</td><td><a href="https://tools.ietf.org/html/rfc7231#section-6.5.1">Bad Request</a></td><td>Bad Request</td><td><a href="reference/api.html#schemaerror">Error</a></td></tr>
@@ -1230,7 +1276,7 @@ fetch('/indexer/api/v1/index_report',
   &quot;sha256:fc84b5febd328eccaa913807716887b3eb5ed08bc22cc6933a9ebf82766725e3&quot;
 ]
 </code></pre>
-<h3 id="delete-the-indexreport-and-associated-information-for-the-given-manifest-hashes,-if-they-exist.-parameters">Parameters</h3>
+<h3 id="delete-the-indexreport-and-associated-information-for-the-given-manifest-hashes,-if-they-exist.-parameters"><a class="header" href="#delete-the-indexreport-and-associated-information-for-the-given-manifest-hashes,-if-they-exist.-parameters">Parameters</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead><tbody>
 <tr><td>body</td><td>body</td><td><a href="reference/api.html#schemabulkdelete">BulkDelete</a></td><td>true</td><td>none</td></tr>
 </tbody></table>
@@ -1245,7 +1291,7 @@ fetch('/indexer/api/v1/index_report',
   &quot;sha256:fc84b5febd328eccaa913807716887b3eb5ed08bc22cc6933a9ebf82766725e3&quot;
 ]
 </code></pre>
-<h3 id="delete-the-indexreport-and-associated-information-for-the-given-manifest-hashes,-if-they-exist.-responses">Responses</h3>
+<h3 id="delete-the-indexreport-and-associated-information-for-the-given-manifest-hashes,-if-they-exist.-responses"><a class="header" href="#delete-the-indexreport-and-associated-information-for-the-given-manifest-hashes,-if-they-exist.-responses">Responses</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Status</th><th>Meaning</th><th>Description</th><th>Schema</th></tr></thead><tbody>
 <tr><td>200</td><td><a href="https://tools.ietf.org/html/rfc7231#section-6.3.1">OK</a></td><td>OK</td><td><a href="reference/api.html#schemabulkdelete">BulkDelete</a></td></tr>
 <tr><td>400</td><td><a href="https://tools.ietf.org/html/rfc7231#section-6.5.1">Bad Request</a></td><td>Bad Request</td><td><a href="reference/api.html#schemaerror">Error</a></td></tr>
@@ -1312,7 +1358,7 @@ fetch('/indexer/api/v1/index_report/{manifest_hash}',
 </code></pre>
 <p><code>DELETE /indexer/api/v1/index_report/{manifest_hash}</code></p>
 <p>Given a Manifest's content addressable hash, any data related to it will be removed it it exists.</p>
-<h3 id="delete-the-indexreport-and-associated-information-for-the-given-manifest-hash,-if-exists.-parameters">Parameters</h3>
+<h3 id="delete-the-indexreport-and-associated-information-for-the-given-manifest-hash,-if-exists.-parameters"><a class="header" href="#delete-the-indexreport-and-associated-information-for-the-given-manifest-hash,-if-exists.-parameters">Parameters</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead><tbody>
 <tr><td>manifest_hash</td><td>path</td><td><a href="reference/api.html#schemadigest">Digest</a></td><td>true</td><td>A digest of a manifest that has been indexed previous to this request.</td></tr>
 </tbody></table>
@@ -1328,7 +1374,7 @@ fetch('/indexer/api/v1/index_report/{manifest_hash}',
   &quot;message&quot;: &quot;string&quot;
 }
 </code></pre>
-<h3 id="delete-the-indexreport-and-associated-information-for-the-given-manifest-hash,-if-exists.-responses">Responses</h3>
+<h3 id="delete-the-indexreport-and-associated-information-for-the-given-manifest-hash,-if-exists.-responses"><a class="header" href="#delete-the-indexreport-and-associated-information-for-the-given-manifest-hash,-if-exists.-responses">Responses</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Status</th><th>Meaning</th><th>Description</th><th>Schema</th></tr></thead><tbody>
 <tr><td>204</td><td><a href="https://tools.ietf.org/html/rfc7231#section-6.3.5">No Content</a></td><td>OK</td><td>None</td></tr>
 <tr><td>400</td><td><a href="https://tools.ietf.org/html/rfc7231#section-6.5.1">Bad Request</a></td><td>Bad Request</td><td><a href="reference/api.html#schemaerror">Error</a></td></tr>
@@ -1395,7 +1441,7 @@ fetch('/indexer/api/v1/index_report/{manifest_hash}',
 </code></pre>
 <p><code>GET /indexer/api/v1/index_report/{manifest_hash}</code></p>
 <p>Given a Manifest's content addressable hash an IndexReport will be retrieved if exists.</p>
-<h3 id="retrieve-an-indexreport-for-the-given-manifest-hash-if-exists.-parameters">Parameters</h3>
+<h3 id="retrieve-an-indexreport-for-the-given-manifest-hash-if-exists.-parameters"><a class="header" href="#retrieve-an-indexreport-for-the-given-manifest-hash-if-exists.-parameters">Parameters</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead><tbody>
 <tr><td>manifest_hash</td><td>path</td><td><a href="reference/api.html#schemadigest">Digest</a></td><td>true</td><td>A digest of a manifest that has been indexed previous to this request.</td></tr>
 </tbody></table>
@@ -1454,7 +1500,7 @@ fetch('/indexer/api/v1/index_report/{manifest_hash}',
   &quot;err&quot;: &quot;&quot;
 }
 </code></pre>
-<h3 id="retrieve-an-indexreport-for-the-given-manifest-hash-if-exists.-responses">Responses</h3>
+<h3 id="retrieve-an-indexreport-for-the-given-manifest-hash-if-exists.-responses"><a class="header" href="#retrieve-an-indexreport-for-the-given-manifest-hash-if-exists.-responses">Responses</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Status</th><th>Meaning</th><th>Description</th><th>Schema</th></tr></thead><tbody>
 <tr><td>200</td><td><a href="https://tools.ietf.org/html/rfc7231#section-6.3.1">OK</a></td><td>IndexReport retrieved</td><td><a href="reference/api.html#schemaindexreport">IndexReport</a></td></tr>
 <tr><td>400</td><td><a href="https://tools.ietf.org/html/rfc7231#section-6.5.1">Bad Request</a></td><td>Bad Request</td><td><a href="reference/api.html#schemaerror">Error</a></td></tr>
@@ -1534,7 +1580,7 @@ A client may be interested in this as a signal that manifests may need to be re-
   &quot;state&quot;: &quot;aae368a064d7c5a433d0bf2c4f5554cc&quot;
 }
 </code></pre>
-<h3 id="report-the-indexer's-internal-configuration-and-state.-responses">Responses</h3>
+<h3 id="report-the-indexer's-internal-configuration-and-state.-responses"><a class="header" href="#report-the-indexer's-internal-configuration-and-state.-responses">Responses</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Status</th><th>Meaning</th><th>Description</th><th>Schema</th></tr></thead><tbody>
 <tr><td>200</td><td><a href="https://tools.ietf.org/html/rfc7231#section-6.3.1">OK</a></td><td>Indexer State</td><td><a href="reference/api.html#schemastate">State</a></td></tr>
 <tr><td>304</td><td><a href="https://tools.ietf.org/html/rfc7232#section-4.1">Not Modified</a></td><td>Indexer State Unchanged</td><td>None</td></tr>
@@ -1547,7 +1593,7 @@ A client may be interested in this as a signal that manifests may need to be re-
 </div><aside class="success">
 This operation does not require authentication
 </aside>
-<h1 id="clairv4-matcher">Matcher</h1>
+<h1 id="clairv4-matcher"><a class="header" href="#clairv4-matcher">Matcher</a></h1>
 <h2 id="retrieve-a-vulnerabilityreport-for-a-given-manifests-content-addressable-hash"><a class="header" href="#retrieve-a-vulnerabilityreport-for-a-given-manifests-content-addressable-hash">Retrieve a VulnerabilityReport for a given manifest's content addressable hash.</a></h2>
 <p><a id="opIdGetVulnerabilityReport"></a></p>
 <blockquote>
@@ -1606,7 +1652,7 @@ fetch('/matcher/api/v1/vulnerability_report/{manifest_hash}',
 </code></pre>
 <p><code>GET /matcher/api/v1/vulnerability_report/{manifest_hash}</code></p>
 <p>Given a Manifest's content addressable hash a VulnerabilityReport will be created. The Manifest <strong>must</strong> have been Indexed first via the Index endpoint.</p>
-<h3 id="retrieve-a-vulnerabilityreport-for-a-given-manifest's-content-addressable-hash.-parameters">Parameters</h3>
+<h3 id="retrieve-a-vulnerabilityreport-for-a-given-manifest's-content-addressable-hash.-parameters"><a class="header" href="#retrieve-a-vulnerabilityreport-for-a-given-manifest's-content-addressable-hash.-parameters">Parameters</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>In</th><th>Type</th><th>Required</th><th>Description</th></tr></thead><tbody>
 <tr><td>manifest_hash</td><td>path</td><td><a href="reference/api.html#schemadigest">Digest</a></td><td>true</td><td>A digest of a manifest that has been indexed previous to this request.</td></tr>
 </tbody></table>
@@ -1706,7 +1752,7 @@ fetch('/matcher/api/v1/vulnerability_report/{manifest_hash}',
   }
 }
 </code></pre>
-<h3 id="retrieve-a-vulnerabilityreport-for-a-given-manifest's-content-addressable-hash.-responses">Responses</h3>
+<h3 id="retrieve-a-vulnerabilityreport-for-a-given-manifest's-content-addressable-hash.-responses"><a class="header" href="#retrieve-a-vulnerabilityreport-for-a-given-manifest's-content-addressable-hash.-responses">Responses</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Status</th><th>Meaning</th><th>Description</th><th>Schema</th></tr></thead><tbody>
 <tr><td>201</td><td><a href="https://tools.ietf.org/html/rfc7231#section-6.3.2">Created</a></td><td>VulnerabilityReport Created</td><td><a href="reference/api.html#schemavulnerabilityreport">VulnerabilityReport</a></td></tr>
 <tr><td>400</td><td><a href="https://tools.ietf.org/html/rfc7231#section-6.5.1">Bad Request</a></td><td>Bad Request</td><td><a href="reference/api.html#schemaerror">Error</a></td></tr>
@@ -1718,7 +1764,7 @@ fetch('/matcher/api/v1/vulnerability_report/{manifest_hash}',
 This operation does not require authentication
 </aside>
 <h1 id="schemas"><a class="header" href="#schemas">Schemas</a></h1>
-<h2 id="tocS_Page">Page</h2>
+<h2 id="tocS_Page"><a class="header" href="#tocS_Page">Page</a></h2>
 <!-- backwards compatibility -->
 <a id="schemapage"></a>
 <a id="schema_Page"></a>
@@ -1736,7 +1782,7 @@ This operation does not require authentication
 <tr><td>size</td><td>int</td><td>false</td><td>none</td><td>The maximum number of elements in a page</td></tr>
 <tr><td>next</td><td>string</td><td>false</td><td>none</td><td>The next id to submit to the api to continue paging</td></tr>
 </tbody></table>
-</div><h2 id="tocS_PagedNotifications">PagedNotifications</h2>
+</div><h2 id="tocS_PagedNotifications"><a class="header" href="#tocS_PagedNotifications">PagedNotifications</a></h2>
 <!-- backwards compatibility -->
 <a id="schemapagednotifications"></a>
 <a id="schema_PagedNotifications"></a>
@@ -1805,7 +1851,7 @@ This operation does not require authentication
 <tr><td>page</td><td>object</td><td>false</td><td>none</td><td>A page object informing the client the next page to retrieve. If page.next becomes &quot;-1&quot; the client should stop paging.</td></tr>
 <tr><td>notifications</td><td>[<a href="reference/api.html#schemanotification">Notification</a>]</td><td>false</td><td>none</td><td>A list of notifications within this page</td></tr>
 </tbody></table>
-</div><h2 id="tocS_Callback">Callback</h2>
+</div><h2 id="tocS_Callback"><a class="header" href="#tocS_Callback">Callback</a></h2>
 <!-- backwards compatibility -->
 <a id="schemacallback"></a>
 <a id="schema_Callback"></a>
@@ -1813,7 +1859,7 @@ This operation does not require authentication
 <a id="tocscallback"></a>
 <pre><code class="language-json">{
   &quot;notification_id&quot;: &quot;269886f3-0146-4f08-9bf7-cb1138d48643&quot;,
-  &quot;callback&quot;: &quot;http://clair-notifier/notifier/api/v1/notifications/269886f3-0146-4f08-9bf7-cb1138d48643&quot;
+  &quot;callback&quot;: &quot;http://clair-notifier/notifier/api/v1/notification/269886f3-0146-4f08-9bf7-cb1138d48643&quot;
 }
 
 </code></pre>
@@ -1823,7 +1869,7 @@ This operation does not require authentication
 <tr><td>notification_id</td><td>string</td><td>false</td><td>none</td><td>the unique identifier for this set of notifications</td></tr>
 <tr><td>callback</td><td>string</td><td>false</td><td>none</td><td>the url where notifications can be retrieved</td></tr>
 </tbody></table>
-</div><h2 id="tocS_VulnSummary">VulnSummary</h2>
+</div><h2 id="tocS_VulnSummary"><a class="header" href="#tocS_VulnSummary">VulnSummary</a></h2>
 <!-- backwards compatibility -->
 <a id="schemavulnsummary"></a>
 <a id="schema_VulnSummary"></a>
@@ -1895,7 +1941,7 @@ This operation does not require authentication
 <tr><td>normalized_severity</td><td>High</td></tr>
 <tr><td>normalized_severity</td><td>Critical</td></tr>
 </tbody></table>
-</div><h2 id="tocS_Notification">Notification</h2>
+</div><h2 id="tocS_Notification"><a class="header" href="#tocS_Notification">Notification</a></h2>
 <!-- backwards compatibility -->
 <a id="schemanotification"></a>
 <a id="schema_Notification"></a>
@@ -1958,7 +2004,7 @@ This operation does not require authentication
 <tr><td>reason</td><td>string</td><td>false</td><td>none</td><td>the reason for the notifcation, [added</td></tr>
 <tr><td>vulnerability</td><td><a href="reference/api.html#schemavulnsummary">VulnSummary</a></td><td>false</td><td>none</td><td>A summary of a vulnerability</td></tr>
 </tbody></table>
-</div><h2 id="tocS_Environment">Environment</h2>
+</div><h2 id="tocS_Environment"><a class="header" href="#tocS_Environment">Environment</a></h2>
 <!-- backwards compatibility -->
 <a id="schemaenvironment"></a>
 <a id="schema_Environment"></a>
@@ -1978,7 +2024,7 @@ This operation does not require authentication
 <tr><td>introduced_in</td><td><a href="reference/api.html#schemadigest">Digest</a></td><td>true</td><td>none</td><td>A digest string with prefixed algorithm. The format is described here: https://github.com/opencontainers/image-spec/blob/master/descriptor.md#digests<br>Digests are used throughout the API to identify Layers and Manifests.</td></tr>
 <tr><td>distribution_id</td><td>string</td><td>true</td><td>none</td><td>The distribution ID found in an associated IndexReport or VulnerabilityReport.</td></tr>
 </tbody></table>
-</div><h2 id="tocS_IndexReport">IndexReport</h2>
+</div><h2 id="tocS_IndexReport"><a class="header" href="#tocS_IndexReport">IndexReport</a></h2>
 <!-- backwards compatibility -->
 <a id="schemaindexreport"></a>
 <a id="schema_IndexReport"></a>
@@ -2047,7 +2093,7 @@ This operation does not require authentication
 <tr><td>success</td><td>boolean</td><td>true</td><td>none</td><td>A bool indicating succcessful index</td></tr>
 <tr><td>err</td><td>string</td><td>true</td><td>none</td><td>An error message on event of unsuccessful index</td></tr>
 </tbody></table>
-</div><h2 id="tocS_VulnerabilityReport">VulnerabilityReport</h2>
+</div><h2 id="tocS_VulnerabilityReport"><a class="header" href="#tocS_VulnerabilityReport">VulnerabilityReport</a></h2>
 <!-- backwards compatibility -->
 <a id="schemavulnerabilityreport"></a>
 <a id="schema_VulnerabilityReport"></a>
@@ -2158,7 +2204,7 @@ This operation does not require authentication
 <tr><td>package_vulnerabilities</td><td>object</td><td>true</td><td>none</td><td>A mapping of Vulnerability.id lists indexed by Package.id.</td></tr>
 <tr><td>» <strong>additionalProperties</strong></td><td>[string]</td><td>false</td><td>none</td><td>none</td></tr>
 </tbody></table>
-</div><h2 id="tocS_Vulnerability">Vulnerability</h2>
+</div><h2 id="tocS_Vulnerability"><a class="header" href="#tocS_Vulnerability">Vulnerability</a></h2>
 <!-- backwards compatibility -->
 <a id="schemavulnerability"></a>
 <a id="schema_Vulnerability"></a>
@@ -2231,7 +2277,7 @@ This operation does not require authentication
 <tr><td>normalized_severity</td><td>High</td></tr>
 <tr><td>normalized_severity</td><td>Critical</td></tr>
 </tbody></table>
-</div><h2 id="tocS_Distribution">Distribution</h2>
+</div><h2 id="tocS_Distribution"><a class="header" href="#tocS_Distribution">Distribution</a></h2>
 <!-- backwards compatibility -->
 <a id="schemadistribution"></a>
 <a id="schema_Distribution"></a>
@@ -2264,7 +2310,7 @@ This operation does not require authentication
 <tr><td>cpe</td><td>string</td><td>true</td><td>none</td><td>none</td></tr>
 <tr><td>pretty_name</td><td>string</td><td>true</td><td>none</td><td>none</td></tr>
 </tbody></table>
-</div><h2 id="tocS_SourcePackage">SourcePackage</h2>
+</div><h2 id="tocS_SourcePackage"><a class="header" href="#tocS_SourcePackage">SourcePackage</a></h2>
 <!-- backwards compatibility -->
 <a id="schemasourcepackage"></a>
 <a id="schema_SourcePackage"></a>
@@ -2303,7 +2349,7 @@ This operation does not require authentication
 <tr><td>module</td><td>string</td><td>false</td><td>none</td><td>none</td></tr>
 <tr><td>cpe</td><td>string</td><td>false</td><td>none</td><td>A CPE identifying the package</td></tr>
 </tbody></table>
-</div><h2 id="tocS_Package">Package</h2>
+</div><h2 id="tocS_Package"><a class="header" href="#tocS_Package">Package</a></h2>
 <!-- backwards compatibility -->
 <a id="schemapackage"></a>
 <a id="schema_Package"></a>
@@ -2342,7 +2388,7 @@ This operation does not require authentication
 <tr><td>module</td><td>string</td><td>false</td><td>none</td><td>A module further defining a namespace for a package</td></tr>
 <tr><td>cpe</td><td>string</td><td>false</td><td>none</td><td>A CPE identifying the package</td></tr>
 </tbody></table>
-</div><h2 id="tocS_Repository">Repository</h2>
+</div><h2 id="tocS_Repository"><a class="header" href="#tocS_Repository">Repository</a></h2>
 <!-- backwards compatibility -->
 <a id="schemarepository"></a>
 <a id="schema_Repository"></a>
@@ -2366,7 +2412,7 @@ This operation does not require authentication
 <tr><td>uri</td><td>string</td><td>false</td><td>none</td><td>none</td></tr>
 <tr><td>cpe</td><td>string</td><td>false</td><td>none</td><td>none</td></tr>
 </tbody></table>
-</div><h2 id="tocS_Version">Version</h2>
+</div><h2 id="tocS_Version"><a class="header" href="#tocS_Version">Version</a></h2>
 <!-- backwards compatibility -->
 <a id="schemaversion"></a>
 <a id="schema_Version"></a>
@@ -2380,7 +2426,7 @@ This operation does not require authentication
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Required</th><th>Restrictions</th><th>Description</th></tr></thead><tbody>
 <tr><td>Version</td><td>string</td><td>false</td><td>none</td><td>Version is a normalized claircore version, composed of a &quot;kind&quot; and an array of integers such that two versions of the same kind have the correct ordering when the integers are compared pair-wise.</td></tr>
 </tbody></table>
-</div><h2 id="tocS_Manifest">Manifest</h2>
+</div><h2 id="tocS_Manifest"><a class="header" href="#tocS_Manifest">Manifest</a></h2>
 <!-- backwards compatibility -->
 <a id="schemamanifest"></a>
 <a id="schema_Manifest"></a>
@@ -2411,7 +2457,7 @@ This operation does not require authentication
 <tr><td>hash</td><td><a href="reference/api.html#schemadigest">Digest</a></td><td>true</td><td>none</td><td>A digest string with prefixed algorithm. The format is described here: https://github.com/opencontainers/image-spec/blob/master/descriptor.md#digests<br>Digests are used throughout the API to identify Layers and Manifests.</td></tr>
 <tr><td>layers</td><td>[<a href="reference/api.html#schemalayer">Layer</a>]</td><td>true</td><td>none</td><td>[A Layer within a Manifest and where Clair may retrieve it.]</td></tr>
 </tbody></table>
-</div><h2 id="tocS_Layer">Layer</h2>
+</div><h2 id="tocS_Layer"><a class="header" href="#tocS_Layer">Layer</a></h2>
 <!-- backwards compatibility -->
 <a id="schemalayer"></a>
 <a id="schema_Layer"></a>
@@ -2439,7 +2485,7 @@ This operation does not require authentication
 <tr><td>headers</td><td>object</td><td>true</td><td>none</td><td>map of arrays of header values keyed by header value. e.g. map[string][]string</td></tr>
 <tr><td>» <strong>additionalProperties</strong></td><td>[string]</td><td>false</td><td>none</td><td>none</td></tr>
 </tbody></table>
-</div><h2 id="tocS_BulkDelete">BulkDelete</h2>
+</div><h2 id="tocS_BulkDelete"><a class="header" href="#tocS_BulkDelete">BulkDelete</a></h2>
 <!-- backwards compatibility -->
 <a id="schemabulkdelete"></a>
 <a id="schema_BulkDelete"></a>
@@ -2455,7 +2501,7 @@ This operation does not require authentication
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Required</th><th>Restrictions</th><th>Description</th></tr></thead><tbody>
 <tr><td>BulkDelete</td><td>[<a href="reference/api.html#schemadigest">Digest</a>]</td><td>false</td><td>none</td><td>An array of Digests to be deleted.</td></tr>
 </tbody></table>
-</div><h2 id="tocS_Error">Error</h2>
+</div><h2 id="tocS_Error"><a class="header" href="#tocS_Error">Error</a></h2>
 <!-- backwards compatibility -->
 <a id="schemaerror"></a>
 <a id="schema_Error"></a>
@@ -2473,7 +2519,7 @@ This operation does not require authentication
 <tr><td>code</td><td>string</td><td>false</td><td>none</td><td>a code for this particular error</td></tr>
 <tr><td>message</td><td>string</td><td>false</td><td>none</td><td>a message with further detail</td></tr>
 </tbody></table>
-</div><h2 id="tocS_State">State</h2>
+</div><h2 id="tocS_State"><a class="header" href="#tocS_State">State</a></h2>
 <!-- backwards compatibility -->
 <a id="schemastate"></a>
 <a id="schema_State"></a>
@@ -2489,7 +2535,7 @@ This operation does not require authentication
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Type</th><th>Required</th><th>Restrictions</th><th>Description</th></tr></thead><tbody>
 <tr><td>state</td><td>string</td><td>true</td><td>none</td><td>an opaque identifier</td></tr>
 </tbody></table>
-</div><h2 id="tocS_Digest">Digest</h2>
+</div><h2 id="tocS_Digest"><a class="header" href="#tocS_Digest">Digest</a></h2>
 <!-- backwards compatibility -->
 <a id="schemadigest"></a>
 <a id="schema_Digest"></a>
@@ -2587,9 +2633,8 @@ DESCRIPTION:
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="config"><a class="header" href="#config">Config</a></h1>
 <h2 id="cli-flags-and-environment-variables"><a class="header" href="#cli-flags-and-environment-variables">CLI Flags And Environment Variables</a></h2>
-<p>Clair is configured by a structured yaml file. 
-Each Clair node needs to specify what mode it will run in and a path to a
-configuration file via CLI flags or environment variables.</p>
+<p>Clair is configured by a structured yaml or JSON<sup class="footnote-reference"><a href="#1">1</a></sup> file and an optional directory of &quot;merge&quot; and &quot;patch&quot; documents<sup class="footnote-reference"><a href="#1">1</a></sup>.
+Each Clair node needs to specify what mode it will run in and a path to a configuration file via CLI flags or environment variables.</p>
 <p>For example:</p>
 <pre><code class="language-shell">$ clair -conf ./path/to/config.yaml -mode indexer
 $ clair -conf ./path/to/config.yaml -mode matcher
@@ -2608,8 +2653,7 @@ $ clair -conf ./path/to/config.yaml -mode matcher
     A file system path to Clair's config file
 </code></pre>
 <p>The above example starts two Clair nodes using the same configuration.
-One will only run the indexing facilities while the other will only run the
-matching facilities.</p>
+One will only run the indexing facilities while the other will only run the matching facilities.</p>
 <p>Environment variables respected by the Go standard library can be specified
 if needed. Some notable examples:</p>
 <ul>
@@ -2619,9 +2663,24 @@ if needed. Some notable examples:</p>
 </ul>
 <p>If running in &quot;combo&quot; mode you <strong>must</strong> supply the <code>indexer</code>, <code>matcher</code>,
 and <code>notifier</code> configuration blocks in the configuration.</p>
+<h2 id="configuration-dropins"><a class="header" href="#configuration-dropins">Configuration dropins</a></h2>
+<p>Starting in Clair version <code>4.7.0</code>, dropin configuration files are supported.</p>
+<p>Given a root configurtaion file of <code>/etc/clair/config.json</code>, all files matching the globs <code>/etc/clair/config.json.d/*.json</code> and <code>/etc/clair/config.json.d/*.json-patch</code> would be loaded in lexical order after the root configuration file.
+Similarly, given <code>/etc/clair/config.yaml</code>, all files matching the globs <code>/etc/clair/config.yaml.d/*.yaml</code> and <code>/etc/clair/config.yaml.d/*.yaml-patch</code> would be loaded.
+Only the extensions <code>yaml</code> and <code>json</code> are supported, and indicate yaml and JSON formatting, respectively.</p>
+<p>The dropin files must have the same extension and format as the root file.
+Dropins with the bare suffix are treated as <a href="reference/rfc7386">merge documents</a>.
+Dropins with the <code>-patch</code> suffix are treated as <a href="reference/rfc6902">patch documents</a> and must contain a valid <a href="reference/rfc6902">RFC 6902</a> structure.
+Yaml documents must be resolvable to the JSON subset.</p>
+<p>Take care with the <a href="reference/rfc7386">merge</a> behavior around lists; a patch operation may be more suitable.
+The <code>clairctl check-config</code> command can be used to ensure a merged configuration is what is intended.
+In addition, placing <code>test</code> operations in a patch file that's evaluated last (such as <code>zz-validate.json-patch</code>) can be used to have Clair refuse to start if some configuration values are not what is intended.</p>
+<p>The application defaults are applied <em>after</em> the configuration is loaded and as such, not reflected in the <code>clairctl check-config</code> command.
+The output of that command is also not currently suitable to be used to &quot;compile&quot; a config to a single file.</p>
 <h2 id="configuration-reference"><a class="header" href="#configuration-reference">Configuration Reference</a></h2>
-<p>Please see the <a href="https://pkg.go.dev/github.com/quay/clair/config">go module documentation</a> for additional
-documentation on defaults and use.</p>
+<p>Please see the <a href="https://pkg.go.dev/github.com/quay/clair/config">go module documentation</a> for additional documentation on defaults and use.
+Starting in version <code>4.7.0</code>, unknown keys are disallowed.
+Configurations that looked valid previously and loaded fine may now cause Clair to refuse to start.</p>
 <pre><code>http_listen_addr: &quot;&quot;
 introspection_addr: &quot;&quot;
 log_level: &quot;&quot;
@@ -2676,8 +2735,6 @@ metrics:
     name: &quot;&quot;
     prometheus:
         endpoint: null
-    dogstatsd:
-        url: &quot;&quot;
 </code></pre>
 <p>Note: the above just lists every key for completeness. Copy-pasting the above as
 a starting point for configuration will result in some options not having their
@@ -2789,7 +2846,7 @@ The location of this Indexer is required.</p>
 <h4 id="matcherperiod"><a class="header" href="#matcherperiod"><code>$.matcher.period</code></a></h4>
 <p>A time.ParseDuration parseable string.</p>
 <p>Determines how often updates for new security advisories will take place.</p>
-<p>Defaults to 30 minutes.</p>
+<p>Defaults to 6 hours.</p>
 <h4 id="matcherdisable_updaters"><a class="header" href="#matcherdisable_updaters"><code>$.matcher.disable_updaters</code></a></h4>
 <p>A boolean value.</p>
 <p>Whether to run background updates or not.</p>
@@ -3052,6 +3109,10 @@ JWT claim.</p>
 <h4 id="metricsprometheusendpoint"><a class="header" href="#metricsprometheusendpoint"><code>$.metrics.prometheus.endpoint</code></a></h4>
 <p>a string value</p>
 <p>Defines the path where metrics will be served.</p>
+<hr />
+<div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
+<p>Support added in version <code>4.7.0</code>.</p>
+</div>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="indexer-1"><a class="header" href="#indexer-1">Indexer</a></h1>
 <p>When Clair is running in Indexer mode, it is responsible for receiving Manifests and generating IndexReports. An IndexReport is an intermediate representation of a manifest's content and is used to discover vulnerabilities.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="matcher-1"><a class="header" href="#matcher-1">Matcher</a></h1>
