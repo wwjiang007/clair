@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Metrics - Clair Documentation</title>
+        <title>Building - Clair Documentation</title>
 
 
         <!-- Custom HTML head -->
@@ -158,20 +158,28 @@
 
                 <div id="content" class="content">
                     <main>
-                        <p>Clair exports <a href="./config.html#metrics">metrics</a> on the <a href="./config.html#introspection_addr">introspection
-port</a> in the Prometheus format.</p>
-<p>The exact metrics exposed are not considered API (and so are subject to change
-between releases) but should be well described. An up-to-date grafana dashboard
-example is in <code>contrib/openshift/grafana</code>.</p>
+                        <h1 id="building"><a class="header" href="#building">Building</a></h1>
+<p>This repo is intended to be built with familiar <code>go build</code> or <code>go install</code> invocations.
+All binaries (excepting debugging tools) are underneath the <code>cmd</code> directory.</p>
+<h3 id="cross-compiling"><a class="header" href="#cross-compiling">Cross-compiling</a></h3>
+<p>Currently Clair does not have any cgo dependencies, so there should not be any cross-compilation concerns.</p>
+<h2 id="container"><a class="header" href="#container">Container</a></h2>
+<p>A <code>Dockerfile</code> for the project is in the repo root.
+<strong>The only upstream-supported means of using it is Buildkit via <code>buildctl</code>.</strong>
+See the <code>container</code>, <code>container-build</code>, <code>dist-container</code>, and <code>dist-clairctl</code> make targets for example invocations.
+The <code>BUILDKIT_HOST</code> environment variable may need to be set, depending on how <code>buildkitd</code> is running in one's environment.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../reference/notifier.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../contribution.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
+                            <a rel="next prefetch" href="../contribution/commit_style.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
 
                         <div style="clear: both"></div>
                     </nav>
@@ -179,10 +187,13 @@ example is in <code>contrib/openshift/grafana</code>.</p>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../reference/notifier.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../contribution.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
+                    <a rel="next prefetch" href="../contribution/commit_style.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
             </nav>
 
         </div>
